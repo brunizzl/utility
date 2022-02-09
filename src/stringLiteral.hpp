@@ -6,10 +6,10 @@
 
 namespace simp {
     
-	template<typename T, std::size_t... Is>
+	template<typename ResT, typename T, std::size_t... Is>
 	constexpr auto array_from_ptr(std::index_sequence<Is...>, const T* init)
 	{
-		return std::array<T, sizeof...(Is)>{ init[Is]... };
+		return std::array<ResT, sizeof...(Is)>{ (ResT)init[Is]... };
 	}
     
 	//taken (and adapted) from here: http://www.open-std.org/jtc1/sc22/wg21/docs/papers/2018/p0732r2.pdf
@@ -17,7 +17,8 @@ namespace simp {
 	struct StringLiteral :std::array<char, N>
 	{
 		//perhaps change to array reference of length N + 1? (+ 1 because '\0')
-		constexpr StringLiteral(const char* init) noexcept :std::array<char, N>(array_from_ptr(std::make_index_sequence<N>{}, init)) {}
+		template<std::integral T>
+		constexpr StringLiteral(T* init) noexcept :std::array<char, N>(array_from_ptr<char>(std::make_index_sequence<N>{}, init)) {}
 
 		constexpr StringLiteral(const std::array<char, N>& init) noexcept :std::array<char, N>(init) {}
 
