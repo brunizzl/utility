@@ -18,7 +18,7 @@ namespace simp {
 		PointedAt* ptr;
 
 		//has to return zero iff this currently represents a pointer
-		std::uintptr_t tag_bits() const noexcept
+		constexpr std::uintptr_t tag_bits() const noexcept
 		{
 			//check if enum fits in unused pointer pits
 			//(only done here, because otherwise PointedAt would need to be defined, when PtrOrInt is instatiated)
@@ -30,24 +30,24 @@ namespace simp {
 		}
 
 	public:
-		PtrOrInt(const PtrOrInt&) = default;
+		constexpr PtrOrInt(const PtrOrInt&) = default;
 
-		PtrOrInt(PointedAt* const new_ptr) noexcept :ptr(new_ptr) {}
+		constexpr PtrOrInt(PointedAt* const new_ptr) noexcept :ptr(new_ptr) {}
 
-		PtrOrInt(Int_T const val, TagEnum const tag) noexcept 
+		constexpr PtrOrInt(Int_T const val, TagEnum const tag) noexcept
 			:ptr(std::bit_cast<PointedAt*>(((std::uintptr_t)val << needed_tag_bits) | (std::uintptr_t)tag))
 		{ 
 			assert(tag > static_cast<TagEnum>(0) && tag < TagEnum::COUNT); //zero represents pointer case
 		}
 
-		PtrOrInt(Int_T const val) noexcept requires (std::is_same_v<TagEnum, PtrState>)
+		constexpr PtrOrInt(Int_T const val) noexcept requires (std::is_same_v<TagEnum, PtrState>)
 			:ptr(std::bit_cast<PointedAt*>(((std::uintptr_t)val << needed_tag_bits) | (std::uintptr_t)PtrState::integer))
 		{}
 
-		PointedAt& operator*() const noexcept { assert(!this->tag_bits()); return *this->ptr; }
-		PointedAt* operator->() const noexcept { assert(!this->tag_bits()); return this->ptr; }
+		constexpr PointedAt& operator*() const noexcept { assert(!this->tag_bits()); return *this->ptr; }
+		constexpr PointedAt* operator->() const noexcept { assert(!this->tag_bits()); return this->ptr; }
 
-		Int_T get_int() const noexcept 
+		constexpr Int_T get_int() const noexcept
 		{
 			assert(this->tag_bits());
 
@@ -56,7 +56,7 @@ namespace simp {
 			return static_cast<Int_T>(shifted); //only cast to (possibly smaller type) after shifting
 		}
 
-		TagEnum get_tag() const noexcept { return static_cast<TagEnum>(this->tag_bits()); }
+		constexpr TagEnum get_tag() const noexcept { return static_cast<TagEnum>(this->tag_bits()); }
 
 	}; //struct PtrOrInt
 

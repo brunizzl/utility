@@ -160,7 +160,7 @@ namespace simp {
 		static constexpr Value value_of() { return static_cast<Value>(static_cast<unsigned>(Enum::template as<E>) + this_offset); }
 
 		template<std::same_as<Enum> E>
-		static constexpr Value value_of() { static_assert(false, "more than one value represents requested type"); }
+		static constexpr Value value_of() { static_assert(!std::same_as<E, Enum>, "more than one value represents requested type"); }
 
 	public:
 		using Base::Base;
@@ -258,7 +258,7 @@ namespace simp {
 		constexpr E to() const noexcept { return static_cast<const Base>(*this).to<E>(); }
 
 		template<std::same_as<T> E>
-		constexpr E to() const noexcept { static_assert(false, "SumEnum can only convert to enum-like types"); }
+		constexpr E to() const noexcept { static_assert(!std::same_as<E, T>, "SumEnum can only convert to enum-like types"); }
 
 
 		//default case: search in parent types
