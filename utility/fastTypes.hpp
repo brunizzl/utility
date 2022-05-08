@@ -42,7 +42,7 @@ namespace simp {
 		constexpr PtrOrInt(const PtrOrInt&) noexcept = default;
 
 		template<typename SndInt_T> requires (std::is_const_v<PointedAt>) //requirement stops redeclaration of ctor above
-			constexpr PtrOrInt(const PtrOrInt<std::remove_const_t<PointedAt>, TagEnum, SndInt_T>& snd) noexcept :ptr(snd.ptr) {}
+		constexpr PtrOrInt(const PtrOrInt<std::remove_const_t<PointedAt>, TagEnum, SndInt_T>& snd) noexcept :ptr(snd.ptr) {}
 
 		constexpr PtrOrInt(PointedAt* const new_ptr) noexcept :ptr(new_ptr) {}
 
