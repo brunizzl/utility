@@ -108,6 +108,12 @@ namespace simp {
 		return itr != end(data) ? *itr : null_val;
 	}
 
+	template<typename T, typename U>
+	consteval auto compare_by(U T::* const by)
+	{
+		return [by](const T& a, const T& b) { return a.*by < b.*by; };
+	}
+
 	template<typename T, std::size_t N, typename U>
 	constexpr bool is_sorted_by(const std::array<T, N>& arr, U T::* const by)
 	{

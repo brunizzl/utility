@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cassert>
 #include <utility>
+#include <memory>
 
 namespace simp::detail_print_type {
 	template<typename T>
@@ -62,6 +63,14 @@ namespace simp {
 		requires (From from) { static_cast<To>(from); };
 
 
+	template<typename A>
+	concept Allocator = requires (A a, std::size_t n, typename A::value_type* pos) {
+		{a.allocate(n)} -> std::convertible_to<typename A::value_type*>;
+		{a.deallocate(pos, n)};
+	};
+	static_assert(Allocator<std::allocator<int>>);
+
+
 	/////////////////   Callable
 
 	template<typename F, typename... Args>
@@ -99,7 +108,7 @@ namespace simp {
 	template<typename C, typename T>
 	concept ContainerOf = std::is_same_v<T, typename C::value_type> &&
 		requires (C c) { {c.begin()} -> IterOver<T>;
-			             {c.end()  } -> IterOver<T>;
+			             {c.end()  }; //end may only return a sentinel
 						 {c.size() } -> std::convertible_to<std::size_t>;
 	};
 
