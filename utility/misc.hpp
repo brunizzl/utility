@@ -122,7 +122,7 @@ namespace simp {
 	}
 
 	template<MinimalNum T>
-	constexpr T nat_pow(T base, const unsigned long long expo) noexcept
+	constexpr T nat_pow(T base, const unsigned long long expo)
 	{
 		T res = 1.0;
 		for (std::size_t power = 1; power <= expo; power *= 2) {

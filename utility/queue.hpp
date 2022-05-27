@@ -43,7 +43,7 @@ namespace simp {
 			Value_T* from = this->start_used;
 			Value_T* to = new_data;
 			do {
-				*to = *from;
+				*to++ = *from;
 				this->incr(from);
 			} while (from != this->end_used);
 
