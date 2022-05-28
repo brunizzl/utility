@@ -13,25 +13,27 @@
 #include "meta.hpp"
 
 #if defined(_MSC_VER)
-#define BMATH_UNREACHABLE __assume(false)
+#define SIMP_UNREACHABLE __assume(false)
 #elif (defined(__GNUC__) || defined(__clang__))
-#define BMATH_UNREACHABLE __builtin_unreachable()
+#define SIMP_UNREACHABLE __builtin_unreachable()
 #else
-#define BMATH_UNREACHABLE ((void)0)
+#define SIMP_UNREACHABLE ((void)0)
 #endif
 
 
 #if defined(_MSC_VER)
-#define BMATH_FORCE_INLINE __forceinline
+#define SIMP_FORCE_INLINE __forceinline
+#elif (defined(__GNUC__) || defined(__clang__))
+#define SIMP_FORCE_INLINE __attribute__((always_inline))
 #else
-#define BMATH_FORCE_INLINE __attribute__((always_inline))
+#define SIMP_FORCE_INLINE
 #endif
 
 
 #ifdef NDEBUG
-#define BMATH_IF_DEBUG(x) ((void)0)
+#define SIMP_IF_DEBUG(x) ((void)0)
 #else
-#define BMATH_IF_DEBUG(x) x
+#define SIMP_IF_DEBUG(x) x
 #endif
 
 
@@ -39,7 +41,7 @@
 namespace simp {
     
     
-	constexpr BMATH_FORCE_INLINE void throw_if(bool cond, const char* const msg)
+	constexpr SIMP_FORCE_INLINE void throw_if(bool cond, const char* const msg)
 	{
 		if (cond) [[unlikely]] {
 			throw std::exception(msg);
@@ -47,21 +49,21 @@ namespace simp {
 	}
 
 	template<const auto x, const auto... xs, typename T>
-	constexpr BMATH_FORCE_INLINE bool is_one_of(const T y) noexcept
+	constexpr SIMP_FORCE_INLINE bool is_one_of(const T y) noexcept
 	{ 
 		if constexpr (!sizeof...(xs)) { return x == y; }
 		else                          { return x == y || is_one_of<xs...>(y); }
 	}	
 
 	template<typename... Bool>
-	constexpr BMATH_FORCE_INLINE bool equivalent(const bool x, const bool y, const Bool... xs)
+	constexpr SIMP_FORCE_INLINE bool equivalent(const bool x, const bool y, const Bool... xs)
 	{
 		if  constexpr (!sizeof...(xs)) { return x == y; }
 		else                           { return x == y && equivalent(x, xs...); }
 	}
 
 	template<typename T, typename U>
-	constexpr BMATH_FORCE_INLINE T change_field(const T& original, U T::* field, const U& replacement)
+	constexpr SIMP_FORCE_INLINE T change_field(const T& original, U T::* field, const U& replacement)
 	{
 		T result = original;
 		result.*field = replacement;
