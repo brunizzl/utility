@@ -13,12 +13,14 @@ namespace simp::detail_print_type {
 	template<typename T>
 	struct PrintType
 	{
-		static_assert(std::is_same_v<void, T>&& std::is_same_v<int, T>);
+		//always fails (but the compiler only knows this once T is instanciated) 
+		//  -> results in printout of T in console
+		static_assert(std::is_same_v<void, T> && std::is_same_v<int, T>);
 		static constexpr bool value = true;
 	};
 } //namespace simp::detail_print_type
 
-#define BMATH_PRINT_TYPE(T) static_assert(detail_print_type::PrintType<T>::value)
+#define SIMP_PRINT_TYPE(x)  static_assert(detail_print_type::PrintType<x>::value)
 
 
 //general concepts
@@ -604,11 +606,12 @@ namespace simp::meta {
 	constexpr std::size_t ssize_v = SSize<A>::value;
 
 	template<SeqInstance S>
-	constexpr std::size_t size(S) { return size_v<S>; }
+	constexpr std::size_t size(S) { return ssize_v<S>; }
 
 	template<auto... xs>
 	struct SSize<Seq<xs...>> :Constant<sizeof...(xs)> {};
 
+	static_assert(size(Seq<1, 2, 3>{}) == 3);
 
 	/////////////////   SCons
 
