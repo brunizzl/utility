@@ -48,19 +48,21 @@ namespace simp {
 		}
 	}
 
-	template<const auto x, const auto... xs, typename T>
+	template<auto x, auto... xs, typename T>
 	constexpr SIMP_FORCE_INLINE bool is_one_of(const T y) noexcept
 	{ 
-		if constexpr (!sizeof...(xs)) { return x == y; }
-		else                          { return x == y || is_one_of<xs...>(y); }
-	}	
-
-	template<typename... Bool>
-	constexpr SIMP_FORCE_INLINE bool equivalent(const bool x, const bool y, const Bool... xs)
-	{
-		if  constexpr (!sizeof...(xs)) { return x == y; }
-		else                           { return x == y && equivalent(x, xs...); }
+		return  ((x == y) || ... || (xs == y));
 	}
+	static_assert(is_one_of<1, 2, 3, 4>(3));
+	static_assert(!is_one_of<1, 2, 3, 4>(5));
+
+	template<typename... Ts>
+	constexpr SIMP_FORCE_INLINE bool equivalent(const bool x, const bool y, const Ts... xs)
+	{
+		return ((x == y) && ... && (xs == y));
+	}
+	static_assert(equivalent(true, true, true, true, true));
+	static_assert(!equivalent(true, true, true, false, true));
 
 	template<typename T, typename U>
 	constexpr SIMP_FORCE_INLINE T change_field(const T& original, U T::* field, const U& replacement)
@@ -111,7 +113,7 @@ namespace simp {
 	}
 
 	template<typename T, typename U>
-	consteval auto compare_by(U T::* const by)
+	constexpr auto compare_by(U T::* const by)
 	{
 		return [by](const T& a, const T& b) { return a.*by < b.*by; };
 	}
@@ -119,8 +121,7 @@ namespace simp {
 	template<typename T, std::size_t N, typename U>
 	constexpr bool is_sorted_by(const std::array<T, N>& arr, U T::* const by)
 	{
-		return std::is_sorted(arr.begin(), arr.end(), 
-			[by](const T& a, const T& b) { return a.*by < b.*by; });
+		return std::is_sorted(arr.begin(), arr.end(), compare_by(by));
 	}
 
 	template<MinimalNum T>
